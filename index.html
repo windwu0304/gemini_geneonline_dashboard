@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeneOnline 議題類別表現分析報告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@300;500;700;900&display=swap');
+        
+        :root {
+            --b2b-color: #2563eb;
+            --b2c-color: #d97706;
+            --fin-color: #64748b;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+        /* Card Styling */
+        .white-panel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .border-b2b { border-left: 4px solid var(--b2b-color); }
+        .border-b2c { border-left: 4px solid var(--b2c-color); }
+        .border-fin { border-left: 4px solid var(--fin-color); }
+
+        /* Pulse */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-[1200px] mx-auto space-y-6">
+        
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="status-dot"></span>
+                    <span class="text-slate-500 text-xs font-bold tracking-wider uppercase">數據分析摘要</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">議題類別表現分析報告</h1>
+                <div class="flex items-center gap-4 mt-2">
+                    <div class="flex flex-col">
+                        <span class="text-[11px] text-slate-400 font-bold">分析週期</span>
+                        <span class="text-sm font-medium text-slate-700">2026.04.17 - 05.14</span>
+                    </div>
+                    <div class="h-6 w-[1px] bg-slate-200"></div>
+                    <div class="flex flex-col">
+                        <span class="text-[11px] text-slate-400 font-bold">文章總數</span>
+                        <span class="text-sm font-medium text-slate-700">187 篇</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="white-panel p-4 flex gap-4 items-center">
+                <div class="text-right">
+                    <div class="text-[11px] text-slate-400 font-bold uppercase">綜合表現排名</div>
+                    <div class="text-lg font-bold text-slate-900">第一名：B2B 類別</div>
+                </div>
+                <div class="bg-blue-50 p-2 rounded-lg">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-12 gap-6">
+            
+            <!-- Radar Chart: Performance DNA -->
+            <div class="col-span-12 lg:col-span-5 white-panel p-6">
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-slate-800">各類別競爭力模型</h3>
+                    <p class="text-slate-500 text-xs">依流量、互動、效率等多維度評估</p>
+                </div>
+                <div class="h-[320px]">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="col-span-12 lg:col-span-7 grid grid-cols-2 gap-6">
+                
+                <!-- B2B Highlight -->
+                <div class="col-span-2 md:col-span-1 white-panel p-6 border-b2b">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-blue-600 text-xs font-bold uppercase">關鍵數據回饋</span>
+                        <span class="text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-[11px] font-bold">B2B</span>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-3xl font-bold text-slate-900">46.1 <span class="text-sm font-normal text-slate-400">秒</span></div>
+                        <div class="text-xs text-slate-500 font-medium">平均停留深度居冠</div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">深度閱讀率</div>
+                            <div class="text-sm font-bold text-blue-600">23.2%</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">單篇流量</div>
+                            <div class="text-sm font-bold text-slate-700">122 PV</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B2C Highlight -->
+                <div class="col-span-2 md:col-span-1 white-panel p-6 border-b2c">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-amber-600 text-xs font-bold uppercase">流量表現指標</span>
+                        <span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded text-[11px] font-bold">B2C</span>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="text-3xl font-bold text-slate-900">10,574 <span class="text-sm font-normal text-slate-400">次</span></div>
+                        <div class="text-xs text-slate-500 font-medium">本月總點擊數最高</div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">爆款文章數</div>
+                            <div class="text-sm font-bold text-amber-600">13 篇</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">讀者停留</div>
+                            <div class="text-sm font-bold text-slate-700">45.8s</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Table -->
+                <div class="col-span-2 white-panel p-6 overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[11px] text-slate-400 uppercase font-bold border-b border-slate-100">
+                                <th class="pb-3">指標項目</th>
+                                <th class="pb-3 text-right">B2B</th>
+                                <th class="pb-3 text-right">B2C</th>
+                                <th class="pb-3 text-right">Finance</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-50">
+                            <tr>
+                                <td class="py-3 text-slate-600 font-medium">總瀏覽量</td>
+                                <td class="text-right">6,843</td>
+                                <td class="text-right text-amber-600 font-bold">10,574</td>
+                                <td class="text-right">5,807</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 text-slate-600 font-medium">平均單篇流量</td>
+                                <td class="text-right">122</td>
+                                <td class="text-right">113</td>
+                                <td class="text-right text-slate-900 font-bold">124</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 text-slate-600 font-medium">流量集中度 (Top 10)</td>
+                                <td class="text-right">50.8%</td>
+                                <td class="text-right font-medium">30.9%</td>
+                                <td class="text-right">52.7%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="col-span-12 white-panel p-8">
+                <div class="flex items-center gap-3 mb-8">
+                    <h2 class="text-xl font-bold text-slate-800">策略執行建議</h2>
+                    <div class="h-[1px] flex-1 bg-slate-100"></div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="space-y-3">
+                        <div class="text-blue-600 font-bold text-xs uppercase tracking-wider">建議行動 01</div>
+                        <h4 class="text-lg font-bold text-slate-900">深耕專業權威內容</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">
+                            B2B 讀者停留時間顯著較長，代表對專業內容有高度需求。建議持續鎖定「氫能技術」與「臨床研究」等主題，能有效累積品牌價值。
+                        </p>
+                    </div>
+                    <div class="space-y-3 md:border-x md:border-slate-100 md:px-8">
+                        <div class="text-amber-600 font-bold text-xs uppercase tracking-wider">建議行動 02</div>
+                        <h4 class="text-lg font-bold text-slate-900">擴大 SEO 流量入口</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">
+                            B2C 文章（如諾羅病毒、護師節）是主要的流量獲取管道。應持續產出科普類長尾關鍵字，並引導流量至專業分析文章。
+                        </p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="text-slate-500 font-bold text-xs uppercase tracking-wider">建議行動 03</div>
+                        <h4 class="text-lg font-bold text-slate-900">即時資訊精準投放</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">
+                            Finance 類別雖然單篇流量高但停留時間短，應定位為「快訊服務」。適合在法說會旺季抓取特定受眾，但不需投入過多長文製作資源。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="pt-8 pb-4 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs border-t border-slate-100">
+            <div>資料來源：GA4 月度統計數據</div>
+            <div class="flex items-center gap-4">
+                <span>© 2026 GeneOnline Data Unit</span>
+                <span class="h-3 w-[1px] bg-slate-200"></span>
+                <span>報告編號：V4-NORMAL</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            
+            Chart.defaults.font.family = "'Inter', 'Noto Sans TC'";
+            Chart.defaults.color = '#64748b';
+
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['總流量規模', '單篇流量', '互動深度', '爆款效率', '受眾廣度'],
+                    datasets: [
+                        {
+                            label: 'B2B (產業技術)',
+                            data: [65, 80, 100, 70, 45],
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            borderColor: '#2563eb',
+                            borderWidth: 2,
+                            pointRadius: 2
+                        },
+                        {
+                            label: 'B2C (大眾科普)',
+                            data: [100, 70, 85, 95, 100],
+                            backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                            borderColor: '#d97706',
+                            borderWidth: 2,
+                            pointRadius: 2
+                        },
+                        {
+                            label: 'Finance (財經)',
+                            data: [50, 100, 35, 60, 40],
+                            backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                            borderColor: '#64748b',
+                            borderWidth: 2,
+                            pointRadius: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#f1f5f9' },
+                            grid: { color: '#f1f5f9' },
+                            pointLabels: { 
+                                font: { size: 11, weight: '600' },
+                                color: '#475569'
+                            },
+                            ticks: { display: false, stepSize: 20 },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                boxWidth: 10,
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
