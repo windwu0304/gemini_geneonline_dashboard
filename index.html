@@ -1,294 +1,295 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeneOnline 議題類別表現分析報告</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@300;500;700;900&display=swap');
-        
-        :root {
-            --b2b-color: #2563eb;
-            --b2c-color: #d97706;
-            --fin-color: #64748b;
-        }
+import React, { useState } from 'react';
+import { 
+  BarChart3, 
+  PieChart, 
+  TrendingUp, 
+  Users, 
+  MousePointer2, 
+  Globe, 
+  ArrowUpRight,
+  ChevronRight,
+  Target,
+  Search,
+  Share2,
+  ExternalLink,
+  Languages
+} from 'lucide-react';
 
-        body {
-            background-color: #f8fafc;
-            color: #1e293b;
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            overflow-x: hidden;
-        }
+const App = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [lang, setLang] = useState('zh'); // 'zh' or 'en'
 
-        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  // 翻譯字典
+  const t = {
+    zh: {
+      title: "本月流量與議題成效分析",
+      subtitle: "數據範圍：2024年 截至目前 | 更新於 1 小時前",
+      overview: "總覽",
+      reports: "詳細報表",
+      stats: {
+        topTopic: "本月最高點擊議題",
+        avgCtr: "平均點閱率",
+        mainSource: "主要流量來源"
+      },
+      rankTitle: "議題類別成效排名",
+      rankSort: "依點擊數排序",
+      trafficTitle: "流量來源分佈",
+      trafficShare: "渠道佔比",
+      insightTitle: "關鍵洞察",
+      insightContent: "Finance (金融類) 表現最為強勁，點擊數與 CTR 均大幅領先。建議下月規劃更多投資理財相關的深度內容。",
+      seoTitle: "SEO 成長機會",
+      seoContent: "Google Search 佔比達 55%，顯示內容在搜尋引擎有極高權重。建議持續針對 Finance 高搜尋量關鍵字進行優化。",
+      actionTitle: "基於本月數據的營運建議",
+      actions: [
+        "加大 Finance 議題產出頻次，目前受眾需求尚未飽和",
+        "B2B 轉化率偏低，應調整為專業 LinkedIn 導向內容",
+        "維持 55% 的搜尋流量，確保 SEO 技術架構穩定"
+      ],
+      downloadBtn: "下載完整 PDF 報表",
+      footer: "© 2024 數據分析系統 版權所有 | 此報表僅供內部決策參考",
+      topics: {
+        finance: "Finance (金融類)",
+        b2c: "B2C (消費類)",
+        b2b: "B2B (企業類)"
+      },
+      sources: {
+        search: "Google Search",
+        direct: "Direct (直接流量)",
+        social: "Social Media",
+        referral: "Referral (轉單)"
+      }
+    },
+    en: {
+      title: "Monthly Traffic & Topic Performance Analysis",
+      subtitle: "Data Range: 2024 YTD | Updated 1 hour ago",
+      overview: "Overview",
+      reports: "Reports",
+      stats: {
+        topTopic: "Top Performing Topic",
+        avgCtr: "Avg. CTR",
+        mainSource: "Main Traffic Source"
+      },
+      rankTitle: "Topic Category Ranking",
+      rankSort: "Sorted by Clicks",
+      trafficTitle: "Traffic Source Distribution",
+      trafficShare: "Channel Share",
+      insightTitle: "Key Insights",
+      insightContent: "Finance shows the strongest performance, significantly leading in both clicks and CTR. Recommended to plan more investment-related content next month.",
+      seoTitle: "SEO Growth Opportunities",
+      seoContent: "Google Search accounts for 55%, showing high authority in search engines. Suggest optimizing for high-volume Finance keywords.",
+      actionTitle: "Operational Recommendations",
+      actions: [
+        "Increase frequency of Finance topics; audience demand is not yet saturated",
+        "B2B conversion is low; pivot to professional LinkedIn-oriented content",
+        "Maintain 55% search traffic share by ensuring stable SEO architecture"
+      ],
+      downloadBtn: "Download Full PDF Report",
+      footer: "© 2024 DataInsight Systems All Rights Reserved | Internal Use Only",
+      topics: {
+        finance: "Finance",
+        b2c: "B2C",
+        b2b: "B2B"
+      },
+      sources: {
+        search: "Google Search",
+        direct: "Direct Traffic",
+        social: "Social Media",
+        referral: "Referral"
+      }
+    }
+  };
 
-        /* Card Styling */
-        .white-panel {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-        }
+  const current = t[lang];
 
-        .border-b2b { border-left: 4px solid var(--b2b-color); }
-        .border-b2c { border-left: 4px solid var(--b2c-color); }
-        .border-fin { border-left: 4px solid var(--fin-color); }
+  // 數據定義 (使用翻譯)
+  const topicData = [
+    { name: current.topics.finance, clicks: 2800, ctr: '4.2%', color: 'bg-blue-600', width: 'w-full' },
+    { name: current.topics.b2c, clicks: 1500, ctr: '2.8%', color: 'bg-emerald-500', width: 'w-[54%]' },
+    { name: current.topics.b2b, clicks: 600, ctr: '1.5%', color: 'bg-amber-400', width: 'w-[21%]' },
+  ];
 
-        /* Pulse */
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-        }
-    </style>
-</head>
-<body class="p-4 md:p-8">
+  const trafficData = [
+    { source: current.sources.search, percentage: 55, icon: <Search size={18} />, color: 'text-blue-600' },
+    { source: current.sources.direct, percentage: 20, icon: <Globe size={18} />, color: 'text-slate-600' },
+    { source: current.sources.social, percentage: 15, icon: <Share2 size={18} />, color: 'text-pink-500' },
+    { source: current.sources.referral, percentage: 10, icon: <ExternalLink size={18} />, color: 'text-indigo-500' },
+  ];
 
-    <div class="max-w-[1200px] mx-auto space-y-6">
-        
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
-            <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                    <span class="status-dot"></span>
-                    <span class="text-slate-500 text-xs font-bold tracking-wider uppercase">數據分析摘要</span>
-                </div>
-                <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">議題類別表現分析報告</h1>
-                <div class="flex items-center gap-4 mt-2">
-                    <div class="flex flex-col">
-                        <span class="text-[11px] text-slate-400 font-bold">分析週期</span>
-                        <span class="text-sm font-medium text-slate-700">2026.04.17 - 05.14</span>
-                    </div>
-                    <div class="h-6 w-[1px] bg-slate-200"></div>
-                    <div class="flex flex-col">
-                        <span class="text-[11px] text-slate-400 font-bold">文章總數</span>
-                        <span class="text-sm font-medium text-slate-700">187 篇</span>
-                    </div>
-                </div>
+  const summaryStats = [
+    { label: current.stats.topTopic, value: 'Finance', change: '+12%', icon: <TrendingUp className="text-blue-600" /> },
+    { label: current.stats.avgCtr, value: '2.83%', change: '+0.5%', icon: <MousePointer2 className="text-emerald-600" /> },
+    { label: current.stats.mainSource, value: 'Google Search', change: '55%', icon: <Users className="text-amber-600" /> },
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+      {/* 導覽列 */}
+      <nav className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="bg-blue-600 p-1.5 rounded-lg">
+              <BarChart3 className="text-white" size={20} />
+            </div>
+            <span className="font-bold text-xl tracking-tight">DataInsight <span className="text-blue-600">Analytics</span></span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex gap-2">
+              <button 
+                onClick={() => setActiveTab('overview')}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'overview' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}
+              >
+                {current.overview}
+              </button>
+              <button 
+                onClick={() => setActiveTab('reports')}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'reports' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}
+              >
+                {current.reports}
+              </button>
             </div>
             
-            <div class="white-panel p-4 flex gap-4 items-center">
-                <div class="text-right">
-                    <div class="text-[11px] text-slate-400 font-bold uppercase">綜合表現排名</div>
-                    <div class="text-lg font-bold text-slate-900">第一名：B2B 類別</div>
-                </div>
-                <div class="bg-blue-50 p-2 rounded-lg">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                </div>
-            </div>
-        </header>
+            <div className="h-6 w-[1px] bg-slate-200 mx-2 hidden md:block"></div>
 
-        <!-- Main Content Grid -->
-        <div class="grid grid-cols-12 gap-6">
-            
-            <!-- Radar Chart: Performance DNA -->
-            <div class="col-span-12 lg:col-span-5 white-panel p-6">
-                <div class="mb-6">
-                    <h3 class="text-lg font-bold text-slate-800">各類別競爭力模型</h3>
-                    <p class="text-slate-500 text-xs">依流量、互動、效率等多維度評估</p>
-                </div>
-                <div class="h-[320px]">
-                    <canvas id="radarChart"></canvas>
-                </div>
-            </div>
+            {/* 語言切換按鈕 */}
+            <button 
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              className="flex items-center gap-2 px-3 py-1.5 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors text-sm font-medium text-slate-700"
+            >
+              <Languages size={16} className="text-blue-600" />
+              {lang === 'zh' ? 'English' : '中文'}
+            </button>
+          </div>
+        </div>
+      </nav>
 
-            <!-- Summary Stats -->
-            <div class="col-span-12 lg:col-span-7 grid grid-cols-2 gap-6">
-                
-                <!-- B2B Highlight -->
-                <div class="col-span-2 md:col-span-1 white-panel p-6 border-b2b">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-blue-600 text-xs font-bold uppercase">關鍵數據回饋</span>
-                        <span class="text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-[11px] font-bold">B2B</span>
-                    </div>
-                    <div class="space-y-1">
-                        <div class="text-3xl font-bold text-slate-900">46.1 <span class="text-sm font-normal text-slate-400">秒</span></div>
-                        <div class="text-xs text-slate-500 font-medium">平均停留深度居冠</div>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-[10px] text-slate-400 font-bold uppercase">深度閱讀率</div>
-                            <div class="text-sm font-bold text-blue-600">23.2%</div>
-                        </div>
-                        <div>
-                            <div class="text-[10px] text-slate-400 font-bold uppercase">單篇流量</div>
-                            <div class="text-sm font-bold text-slate-700">122 PV</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- B2C Highlight -->
-                <div class="col-span-2 md:col-span-1 white-panel p-6 border-b2c">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-amber-600 text-xs font-bold uppercase">流量表現指標</span>
-                        <span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded text-[11px] font-bold">B2C</span>
-                    </div>
-                    <div class="space-y-1">
-                        <div class="text-3xl font-bold text-slate-900">10,574 <span class="text-sm font-normal text-slate-400">次</span></div>
-                        <div class="text-xs text-slate-500 font-medium">本月總點擊數最高</div>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-4">
-                        <div>
-                            <div class="text-[10px] text-slate-400 font-bold uppercase">爆款文章數</div>
-                            <div class="text-sm font-bold text-amber-600">13 篇</div>
-                        </div>
-                        <div>
-                            <div class="text-[10px] text-slate-400 font-bold uppercase">讀者停留</div>
-                            <div class="text-sm font-bold text-slate-700">45.8s</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Comparison Table -->
-                <div class="col-span-2 white-panel p-6 overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-[11px] text-slate-400 uppercase font-bold border-b border-slate-100">
-                                <th class="pb-3">指標項目</th>
-                                <th class="pb-3 text-right">B2B</th>
-                                <th class="pb-3 text-right">B2C</th>
-                                <th class="pb-3 text-right">Finance</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm divide-y divide-slate-50">
-                            <tr>
-                                <td class="py-3 text-slate-600 font-medium">總瀏覽量</td>
-                                <td class="text-right">6,843</td>
-                                <td class="text-right text-amber-600 font-bold">10,574</td>
-                                <td class="text-right">5,807</td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 text-slate-600 font-medium">平均單篇流量</td>
-                                <td class="text-right">122</td>
-                                <td class="text-right">113</td>
-                                <td class="text-right text-slate-900 font-bold">124</td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 text-slate-600 font-medium">流量集中度 (Top 10)</td>
-                                <td class="text-right">50.8%</td>
-                                <td class="text-right font-medium">30.9%</td>
-                                <td class="text-right">52.7%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Recommendations -->
-            <div class="col-span-12 white-panel p-8">
-                <div class="flex items-center gap-3 mb-8">
-                    <h2 class="text-xl font-bold text-slate-800">策略執行建議</h2>
-                    <div class="h-[1px] flex-1 bg-slate-100"></div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="space-y-3">
-                        <div class="text-blue-600 font-bold text-xs uppercase tracking-wider">建議行動 01</div>
-                        <h4 class="text-lg font-bold text-slate-900">深耕專業權威內容</h4>
-                        <p class="text-slate-500 text-sm leading-relaxed">
-                            B2B 讀者停留時間顯著較長，代表對專業內容有高度需求。建議持續鎖定「氫能技術」與「臨床研究」等主題，能有效累積品牌價值。
-                        </p>
-                    </div>
-                    <div class="space-y-3 md:border-x md:border-slate-100 md:px-8">
-                        <div class="text-amber-600 font-bold text-xs uppercase tracking-wider">建議行動 02</div>
-                        <h4 class="text-lg font-bold text-slate-900">擴大 SEO 流量入口</h4>
-                        <p class="text-slate-500 text-sm leading-relaxed">
-                            B2C 文章（如諾羅病毒、護師節）是主要的流量獲取管道。應持續產出科普類長尾關鍵字，並引導流量至專業分析文章。
-                        </p>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="text-slate-500 font-bold text-xs uppercase tracking-wider">建議行動 03</div>
-                        <h4 class="text-lg font-bold text-slate-900">即時資訊精準投放</h4>
-                        <p class="text-slate-500 text-sm leading-relaxed">
-                            Finance 類別雖然單篇流量高但停留時間短，應定位為「快訊服務」。適合在法說會旺季抓取特定受眾，但不需投入過多長文製作資源。
-                        </p>
-                    </div>
-                </div>
-            </div>
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        {/* 標題區域 */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">{current.title}</h1>
+          <p className="text-slate-500">{current.subtitle}</p>
         </div>
 
-        <footer class="pt-8 pb-4 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs border-t border-slate-100">
-            <div>資料來源：GA4 月度統計數據</div>
-            <div class="flex items-center gap-4">
-                <span>© 2026 GeneOnline Data Unit</span>
-                <span class="h-3 w-[1px] bg-slate-200"></span>
-                <span>報告編號：V4-NORMAL</span>
+        {/* 摘要卡片 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {summaryStats.map((stat, idx) => (
+            <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-2 bg-slate-50 rounded-lg">{stat.icon}</div>
+                <span className="text-xs font-semibold px-2 py-1 bg-green-50 text-green-600 rounded-full flex items-center gap-1">
+                  <ArrowUpRight size={12} /> {stat.change}
+                </span>
+              </div>
+              <p className="text-slate-500 text-sm mb-1">{stat.label}</p>
+              <h3 className="text-2xl font-bold">{stat.value}</h3>
             </div>
-        </footer>
+          ))}
+        </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* 議題類別分析 */}
+          <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <Target size={20} className="text-blue-600" /> {current.rankTitle}
+              </h2>
+              <span className="text-xs text-slate-400">{current.rankSort}</span>
+            </div>
+            <div className="space-y-6">
+              {topicData.map((topic, idx) => (
+                <div key={idx}>
+                  <div className="flex justify-between items-end mb-2">
+                    <div>
+                      <span className="font-semibold block">{topic.name}</span>
+                      <span className="text-sm text-slate-500">CTR: {topic.ctr}</span>
+                    </div>
+                    <span className="font-mono font-bold text-blue-600">{topic.clicks.toLocaleString()} Clicks</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                    <div className={`${topic.color} h-full rounded-full ${topic.width} transition-all duration-1000`}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+              <h4 className="text-blue-800 font-bold text-sm mb-1 flex items-center gap-1">
+                <TrendingUp size={14} /> {current.insightTitle}
+              </h4>
+              <p className="text-blue-700 text-sm leading-relaxed">
+                {current.insightContent}
+              </p>
+            </div>
+          </section>
+
+          {/* 流量來源分析 */}
+          <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <PieChart size={20} className="text-blue-600" /> {current.trafficTitle}
+              </h2>
+              <span className="text-xs text-slate-400">{current.trafficShare}</span>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              {trafficData.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+                  <div className={`p-3 rounded-full bg-white shadow-sm border border-slate-100 ${item.color}`}>
+                    {item.icon}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-semibold">{item.source}</span>
+                      <span className="font-bold">{item.percentage}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                      <div 
+                        className={`bg-slate-700 h-full rounded-full transition-all duration-1000`} 
+                        style={{ width: `${item.percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 pt-6 border-t border-slate-100">
+              <div className="flex items-start gap-3">
+                <div className="bg-amber-100 p-2 rounded-lg text-amber-600">
+                  <TrendingUp size={18} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm">{current.seoTitle}</h4>
+                  <p className="text-sm text-slate-500 mt-1">
+                    {current.seoContent}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* 下一步行動建議 */}
+        <section className="mt-8 bg-slate-900 text-white p-8 rounded-2xl">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h2 className="text-xl font-bold mb-2">{current.actionTitle}</h2>
+              <ul className="space-y-2 opacity-80 text-sm">
+                {current.actions.map((action, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <ChevronRight size={14} className="text-blue-400" /> {action}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-900/20">
+              {current.downloadBtn} <ExternalLink size={18} />
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer className="max-w-6xl mx-auto px-4 py-12 text-center text-slate-400 text-sm">
+        <p>{current.footer}</p>
+      </footer>
     </div>
+  );
+};
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const radarCtx = document.getElementById('radarChart').getContext('2d');
-            
-            Chart.defaults.font.family = "'Inter', 'Noto Sans TC'";
-            Chart.defaults.color = '#64748b';
-
-            new Chart(radarCtx, {
-                type: 'radar',
-                data: {
-                    labels: ['總流量規模', '單篇流量', '互動深度', '爆款效率', '受眾廣度'],
-                    datasets: [
-                        {
-                            label: 'B2B (產業技術)',
-                            data: [65, 80, 100, 70, 45],
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                            borderColor: '#2563eb',
-                            borderWidth: 2,
-                            pointRadius: 2
-                        },
-                        {
-                            label: 'B2C (大眾科普)',
-                            data: [100, 70, 85, 95, 100],
-                            backgroundColor: 'rgba(217, 119, 6, 0.1)',
-                            borderColor: '#d97706',
-                            borderWidth: 2,
-                            pointRadius: 2
-                        },
-                        {
-                            label: 'Finance (財經)',
-                            data: [50, 100, 35, 60, 40],
-                            backgroundColor: 'rgba(100, 116, 139, 0.1)',
-                            borderColor: '#64748b',
-                            borderWidth: 2,
-                            pointRadius: 2
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: '#f1f5f9' },
-                            grid: { color: '#f1f5f9' },
-                            pointLabels: { 
-                                font: { size: 11, weight: '600' },
-                                color: '#475569'
-                            },
-                            ticks: { display: false, stepSize: 20 },
-                            suggestedMin: 0,
-                            suggestedMax: 100
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                boxWidth: 10,
-                                font: { size: 11 }
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+export default App;
