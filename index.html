@@ -116,9 +116,9 @@ const App = () => {
   ];
 
   const summaryStats = [
-    { label: current.stats.topTopic, value: 'Finance', change: '+12%', icon: <TrendingUp className="text-blue-600" /> },
+    { label: current.stats.topTopic, value: current.topics.finance, change: '+12%', icon: <TrendingUp className="text-blue-600" /> },
     { label: current.stats.avgCtr, value: '2.83%', change: '+0.5%', icon: <MousePointer2 className="text-emerald-600" /> },
-    { label: current.stats.mainSource, value: 'Google Search', change: '55%', icon: <Users className="text-amber-600" /> },
+    { label: current.stats.mainSource, value: current.sources.search, change: '55%', icon: <Users className="text-amber-600" /> },
   ];
 
   return (
@@ -132,6 +132,7 @@ const App = () => {
             </div>
             <span className="font-bold text-xl tracking-tight">DataInsight <span className="text-blue-600">Analytics</span></span>
           </div>
+          
           <div className="flex items-center gap-4">
             <div className="hidden md:flex gap-2">
               <button 
@@ -150,13 +151,13 @@ const App = () => {
             
             <div className="h-6 w-[1px] bg-slate-200 mx-2 hidden md:block"></div>
 
-            {/* 語言切換按鈕 */}
+            {/* 語言切換按鈕 - 加強視覺提示 */}
             <button 
               onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-              className="flex items-center gap-2 px-3 py-1.5 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors text-sm font-medium text-slate-700"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-all text-sm font-bold shadow-sm active:scale-95"
             >
-              <Languages size={16} className="text-blue-600" />
-              {lang === 'zh' ? 'English' : '中文'}
+              <Languages size={16} />
+              <span>{lang === 'zh' ? 'English' : '中文'}</span>
             </button>
           </div>
         </div>
@@ -165,8 +166,8 @@ const App = () => {
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* 標題區域 */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{current.title}</h1>
-          <p className="text-slate-500">{current.subtitle}</p>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight">{current.title}</h1>
+          <p className="text-slate-500 font-medium">{current.subtitle}</p>
         </div>
 
         {/* 摘要卡片 */}
@@ -180,7 +181,7 @@ const App = () => {
                 </span>
               </div>
               <p className="text-slate-500 text-sm mb-1">{stat.label}</p>
-              <h3 className="text-2xl font-bold">{stat.value}</h3>
+              <h3 className="text-2xl font-bold tracking-tight">{stat.value}</h3>
             </div>
           ))}
         </div>
@@ -192,7 +193,7 @@ const App = () => {
               <h2 className="text-lg font-bold flex items-center gap-2">
                 <Target size={20} className="text-blue-600" /> {current.rankTitle}
               </h2>
-              <span className="text-xs text-slate-400">{current.rankSort}</span>
+              <span className="text-xs text-slate-400 font-medium">{current.rankSort}</span>
             </div>
             <div className="space-y-6">
               {topicData.map((topic, idx) => (
@@ -205,12 +206,12 @@ const App = () => {
                     <span className="font-mono font-bold text-blue-600">{topic.clicks.toLocaleString()} Clicks</span>
                   </div>
                   <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-                    <div className={`${topic.color} h-full rounded-full ${topic.width} transition-all duration-1000`}></div>
+                    <div className={`${topic.color} h-full rounded-full ${topic.width} transition-all duration-1000 ease-out`}></div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100 shadow-inner">
               <h4 className="text-blue-800 font-bold text-sm mb-1 flex items-center gap-1">
                 <TrendingUp size={14} /> {current.insightTitle}
               </h4>
@@ -226,7 +227,7 @@ const App = () => {
               <h2 className="text-lg font-bold flex items-center gap-2">
                 <PieChart size={20} className="text-blue-600" /> {current.trafficTitle}
               </h2>
-              <span className="text-xs text-slate-400">{current.trafficShare}</span>
+              <span className="text-xs text-slate-400 font-medium">{current.trafficShare}</span>
             </div>
             <div className="grid grid-cols-1 gap-4">
               {trafficData.map((item, idx) => (
@@ -241,7 +242,7 @@ const App = () => {
                     </div>
                     <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                       <div 
-                        className={`bg-slate-700 h-full rounded-full transition-all duration-1000`} 
+                        className={`bg-slate-700 h-full rounded-full transition-all duration-1000 ease-out`} 
                         style={{ width: `${item.percentage}%` }}
                       ></div>
                     </div>
@@ -251,12 +252,12 @@ const App = () => {
             </div>
             <div className="mt-6 pt-6 border-t border-slate-100">
               <div className="flex items-start gap-3">
-                <div className="bg-amber-100 p-2 rounded-lg text-amber-600">
+                <div className="bg-amber-100 p-2 rounded-lg text-amber-600 shadow-sm">
                   <TrendingUp size={18} />
                 </div>
                 <div>
                   <h4 className="font-bold text-sm">{current.seoTitle}</h4>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <p className="text-sm text-slate-500 mt-1 leading-relaxed">
                     {current.seoContent}
                   </p>
                 </div>
@@ -266,27 +267,34 @@ const App = () => {
         </div>
 
         {/* 下一步行動建議 */}
-        <section className="mt-8 bg-slate-900 text-white p-8 rounded-2xl">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <section className="mt-8 bg-slate-900 text-white p-8 rounded-3xl shadow-xl shadow-slate-200">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div>
-              <h2 className="text-xl font-bold mb-2">{current.actionTitle}</h2>
-              <ul className="space-y-2 opacity-80 text-sm">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Target size={22} className="text-blue-400" />
+                {current.actionTitle}
+              </h2>
+              <ul className="space-y-3 opacity-90 text-sm">
                 {current.actions.map((action, idx) => (
-                  <li key={idx} className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-blue-400" /> {action}
+                  <li key={idx} className="flex items-start gap-3">
+                    <div className="mt-1 bg-blue-500/20 p-0.5 rounded">
+                      <ChevronRight size={14} className="text-blue-400" />
+                    </div>
+                    <span>{action}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-900/20">
-              {current.downloadBtn} <ExternalLink size={18} />
+            <button className="whitespace-nowrap bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-lg shadow-blue-900/40 active:scale-95 group">
+              {current.downloadBtn} 
+              <ExternalLink size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </button>
           </div>
         </section>
       </main>
 
-      <footer className="max-w-6xl mx-auto px-4 py-12 text-center text-slate-400 text-sm">
-        <p>{current.footer}</p>
+      <footer className="max-w-6xl mx-auto px-4 py-12 text-center text-slate-400 text-sm font-medium">
+        <p className="border-t border-slate-200 pt-8">{current.footer}</p>
       </footer>
     </div>
   );
