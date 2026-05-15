@@ -1,292 +1,301 @@
 import React, { useState } from 'react';
-import { 
-  BarChart3, 
-  PieChart, 
-  TrendingUp, 
-  Users, 
-  MousePointer2, 
-  Globe, 
-  ArrowUpRight,
-  ChevronRight,
-  Target,
-  Search,
-  Share2,
-  ExternalLink,
-  Languages
-} from 'lucide-react';
+
+// --- 定義 SVG 圖示組件，避免外部套件載入失敗 ---
+const Icon = {
+  Chart: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+  ),
+  Trend: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+  ),
+  Users: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  ),
+  Click: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="m13 13 6 6"/></svg>
+  ),
+  Globe: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+  ),
+  Search: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  ),
+  Share: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+  ),
+  Target: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+  ),
+  Lang: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+  )
+};
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [lang, setLang] = useState('zh'); // 'zh' or 'en'
+  const [lang, setLang] = useState('zh'); // 'zh' 為繁體中文, 'en' 為英文
 
-  // 翻譯字典
-  const t = {
+  // 翻譯文本定義
+  const translations = {
     zh: {
-      title: "本月流量與議題成效分析",
-      subtitle: "數據範圍：2024年 截至目前 | 更新於 1 小時前",
-      overview: "總覽",
-      reports: "詳細報表",
-      stats: {
-        topTopic: "本月最高點擊議題",
-        avgCtr: "平均點閱率",
-        mainSource: "主要流量來源"
+      nav: { brand: "數據洞察", overview: "數據總覽", switch: "Switch to English" },
+      header: { title: "本月流量與議題成效分析", subtitle: "更新時間：2024年3月 | 數據來源：Google Analytics" },
+      summary: {
+        top: "最高點擊議題",
+        ctr: "平均點閱率",
+        source: "主要流量渠道"
       },
-      rankTitle: "議題類別成效排名",
-      rankSort: "依點擊數排序",
-      trafficTitle: "流量來源分佈",
-      trafficShare: "渠道佔比",
-      insightTitle: "關鍵洞察",
-      insightContent: "Finance (金融類) 表現最為強勁，點擊數與 CTR 均大幅領先。建議下月規劃更多投資理財相關的深度內容。",
-      seoTitle: "SEO 成長機會",
-      seoContent: "Google Search 佔比達 55%，顯示內容在搜尋引擎有極高權重。建議持續針對 Finance 高搜尋量關鍵字進行優化。",
-      actionTitle: "基於本月數據的營運建議",
-      actions: [
-        "加大 Finance 議題產出頻次，目前受眾需求尚未飽和",
-        "B2B 轉化率偏低，應調整為專業 LinkedIn 導向內容",
-        "維持 55% 的搜尋流量，確保 SEO 技術架構穩定"
-      ],
-      downloadBtn: "下載完整 PDF 報表",
-      footer: "© 2024 數據分析系統 版權所有 | 此報表僅供內部決策參考",
       topics: {
+        title: "議題類別成效排名",
+        sort: "按點擊次數排序",
         finance: "Finance (金融類)",
         b2c: "B2C (消費類)",
-        b2b: "B2B (企業類)"
+        b2b: "B2B (企業類)",
+        insightTitle: "核心發現",
+        insightBody: "Finance (金融類) 的 CTR 表現卓越，顯示理財與投資相關議題在目前市場環境下極具吸引力。"
       },
-      sources: {
-        search: "Google Search",
+      traffic: {
+        title: "流量來源分佈",
+        share: "渠道流量佔比",
+        search: "Google Search (搜尋)",
         direct: "Direct (直接流量)",
-        social: "Social Media",
-        referral: "Referral (轉單)"
-      }
+        social: "Social (社群媒體)",
+        referral: "Referral (外部轉單)",
+        seoTitle: "SEO 優化建議",
+        seoBody: "搜尋引擎流量佔比超過 50%，建議持續優化 Finance 類別的長尾關鍵字，以維持增長動能。"
+      },
+      actions: {
+        title: "後續行動方針",
+        items: [
+          "增加 Finance 議題的產出頻率，特別是懶人包與分析類文章",
+          "B2B 內容應調整為個案研究形式，以提高轉化率",
+          "針對社群平台開發短音頻或圖文式金融快訊"
+        ],
+        btn: "下載報表 (PDF)"
+      },
+      footer: "© 2024 DataInsight Analytics. 僅供內部決策參考。"
     },
     en: {
-      title: "Monthly Traffic & Topic Performance Analysis",
-      subtitle: "Data Range: 2024 YTD | Updated 1 hour ago",
-      overview: "Overview",
-      reports: "Reports",
-      stats: {
-        topTopic: "Top Performing Topic",
-        avgCtr: "Avg. CTR",
-        mainSource: "Main Traffic Source"
+      nav: { brand: "DataInsight", overview: "Dashboard", switch: "切換為繁體中文" },
+      header: { title: "Monthly Traffic & Topic Performance", subtitle: "Last Updated: Mar 2024 | Source: Google Analytics" },
+      summary: {
+        top: "Top Topic",
+        ctr: "Avg. CTR",
+        source: "Main Channel"
       },
-      rankTitle: "Topic Category Ranking",
-      rankSort: "Sorted by Clicks",
-      trafficTitle: "Traffic Source Distribution",
-      trafficShare: "Channel Share",
-      insightTitle: "Key Insights",
-      insightContent: "Finance shows the strongest performance, significantly leading in both clicks and CTR. Recommended to plan more investment-related content next month.",
-      seoTitle: "SEO Growth Opportunities",
-      seoContent: "Google Search accounts for 55%, showing high authority in search engines. Suggest optimizing for high-volume Finance keywords.",
-      actionTitle: "Operational Recommendations",
-      actions: [
-        "Increase frequency of Finance topics; audience demand is not yet saturated",
-        "B2B conversion is low; pivot to professional LinkedIn-oriented content",
-        "Maintain 55% search traffic share by ensuring stable SEO architecture"
-      ],
-      downloadBtn: "Download Full PDF Report",
-      footer: "© 2024 DataInsight Systems All Rights Reserved | Internal Use Only",
       topics: {
+        title: "Topic Performance Ranking",
+        sort: "Sorted by Clicks",
         finance: "Finance",
         b2c: "B2C",
-        b2b: "B2B"
+        b2b: "B2B",
+        insightTitle: "Key Finding",
+        insightBody: "Finance category CTR is exceptional, indicating that investment topics are highly resonant in the current market."
       },
-      sources: {
+      traffic: {
+        title: "Traffic Distribution",
+        share: "Channel Percentage",
         search: "Google Search",
         direct: "Direct Traffic",
         social: "Social Media",
-        referral: "Referral"
-      }
+        referral: "Referral",
+        seoTitle: "SEO Suggestions",
+        seoBody: "Search engine traffic exceeds 50%. Recommend optimizing long-tail keywords for Finance to sustain growth."
+      },
+      actions: {
+        title: "Strategic Actions",
+        items: [
+          "Increase production frequency of Finance topics, especially analysis articles",
+          "Convert B2B content to case studies to improve conversion rates",
+          "Develop short-form financial alerts for social media platforms"
+        ],
+        btn: "Download PDF"
+      },
+      footer: "© 2024 DataInsight Analytics. Internal Use Only."
     }
   };
 
-  const current = t[lang];
+  const t = translations[lang];
 
-  // 數據定義 (使用翻譯)
+  // 靜態數據
   const topicData = [
-    { name: current.topics.finance, clicks: 2800, ctr: '4.2%', color: 'bg-blue-600', width: 'w-full' },
-    { name: current.topics.b2c, clicks: 1500, ctr: '2.8%', color: 'bg-emerald-500', width: 'w-[54%]' },
-    { name: current.topics.b2b, clicks: 600, ctr: '1.5%', color: 'bg-amber-400', width: 'w-[21%]' },
+    { name: t.topics.finance, clicks: 2800, ctr: '4.2%', color: 'bg-blue-600', width: '100%' },
+    { name: t.topics.b2c, clicks: 1500, ctr: '2.8%', color: 'bg-teal-500', width: '54%' },
+    { name: t.topics.b2b, clicks: 600, ctr: '1.5%', color: 'bg-amber-400', width: '22%' },
   ];
 
   const trafficData = [
-    { source: current.sources.search, percentage: 55, icon: <Search size={18} />, color: 'text-blue-600' },
-    { source: current.sources.direct, percentage: 20, icon: <Globe size={18} />, color: 'text-slate-600' },
-    { source: current.sources.social, percentage: 15, icon: <Share2 size={18} />, color: 'text-pink-500' },
-    { source: current.sources.referral, percentage: 10, icon: <ExternalLink size={18} />, color: 'text-indigo-500' },
-  ];
-
-  const summaryStats = [
-    { label: current.stats.topTopic, value: 'Finance', change: '+12%', icon: <TrendingUp className="text-blue-600" /> },
-    { label: current.stats.avgCtr, value: '2.83%', change: '+0.5%', icon: <MousePointer2 className="text-emerald-600" /> },
-    { label: current.stats.mainSource, value: 'Google Search', change: '55%', icon: <Users className="text-amber-600" /> },
+    { name: t.traffic.search, percent: 55, color: 'text-blue-600', bg: 'bg-blue-600', icon: <Icon.Search /> },
+    { name: t.traffic.direct, percent: 20, color: 'text-gray-600', bg: 'bg-gray-600', icon: <Icon.Globe /> },
+    { name: t.traffic.social, percent: 15, color: 'text-pink-500', bg: 'bg-pink-500', icon: <Icon.Share /> },
+    { name: t.traffic.referral, percent: 10, color: 'text-indigo-600', bg: 'bg-indigo-600', icon: <Icon.Target /> },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-gray-50 text-slate-900 font-sans">
       {/* 導覽列 */}
-      <nav className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-blue-600 p-1.5 rounded-lg">
-              <BarChart3 className="text-white" size={20} />
+            <div className="bg-blue-600 p-1.5 rounded-lg text-white">
+              <Icon.Chart />
             </div>
-            <span className="font-bold text-xl tracking-tight">DataInsight <span className="text-blue-600">Analytics</span></span>
+            <span className="font-bold text-xl">{t.nav.brand}</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex gap-2">
-              <button 
-                onClick={() => setActiveTab('overview')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'overview' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}
-              >
-                {current.overview}
-              </button>
-              <button 
-                onClick={() => setActiveTab('reports')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'reports' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}
-              >
-                {current.reports}
-              </button>
-            </div>
-            
-            <div className="h-6 w-[1px] bg-slate-200 mx-2 hidden md:block"></div>
-
-            {/* 語言切換按鈕 */}
-            <button 
-              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-              className="flex items-center gap-2 px-3 py-1.5 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors text-sm font-medium text-slate-700"
-            >
-              <Languages size={16} className="text-blue-600" />
-              {lang === 'zh' ? 'English' : '中文'}
-            </button>
-          </div>
+          <button 
+            onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-slate-800 transition-all active:scale-95"
+          >
+            <Icon.Lang />
+            {t.nav.switch}
+          </button>
         </div>
       </nav>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
-        {/* 標題區域 */}
+        {/* 標題 */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{current.title}</h1>
-          <p className="text-slate-500">{current.subtitle}</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 mb-2">{t.header.title}</h1>
+          <p className="text-slate-500 font-medium">{t.header.subtitle}</p>
         </div>
 
-        {/* 摘要卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {summaryStats.map((stat, idx) => (
-            <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 bg-slate-50 rounded-lg">{stat.icon}</div>
-                <span className="text-xs font-semibold px-2 py-1 bg-green-50 text-green-600 rounded-full flex items-center gap-1">
-                  <ArrowUpRight size={12} /> {stat.change}
-                </span>
-              </div>
-              <p className="text-slate-500 text-sm mb-1">{stat.label}</p>
-              <h3 className="text-2xl font-bold">{stat.value}</h3>
+        {/* 摘要數據卡片 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Icon.Trend /></div>
+              <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full">+12% MoM</span>
             </div>
-          ))}
+            <p className="text-gray-500 text-sm font-medium mb-1">{t.summary.top}</p>
+            <h3 className="text-2xl font-bold text-slate-800">{lang === 'zh' ? 'Finance (金融)' : 'Finance'}</h3>
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-2 bg-teal-50 text-teal-600 rounded-lg"><Icon.Click /></div>
+              <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full">+0.5%</span>
+            </div>
+            <p className="text-gray-500 text-sm font-medium mb-1">{t.summary.ctr}</p>
+            <h3 className="text-2xl font-bold text-slate-800">2.83%</h3>
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-2 bg-amber-50 text-amber-600 rounded-lg"><Icon.Users /></div>
+              <span className="text-xs font-bold bg-gray-100 text-gray-500 px-2 py-1 rounded-full">Organic</span>
+            </div>
+            <p className="text-gray-500 text-sm font-medium mb-1">{t.summary.source}</p>
+            <h3 className="text-2xl font-bold text-slate-800">Google Search</h3>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* 議題類別分析 */}
-          <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold flex items-center gap-2">
-                <Target size={20} className="text-blue-600" /> {current.rankTitle}
+          {/* 議題排行圖表 */}
+          <section className="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Icon.Target /> {t.topics.title}
               </h2>
-              <span className="text-xs text-slate-400">{current.rankSort}</span>
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t.topics.sort}</span>
             </div>
-            <div className="space-y-6">
-              {topicData.map((topic, idx) => (
-                <div key={idx}>
+            <div className="space-y-8">
+              {topicData.map((item, i) => (
+                <div key={i}>
                   <div className="flex justify-between items-end mb-2">
                     <div>
-                      <span className="font-semibold block">{topic.name}</span>
-                      <span className="text-sm text-slate-500">CTR: {topic.ctr}</span>
+                      <span className="font-bold text-slate-800 block">{item.name}</span>
+                      <span className="text-sm text-gray-500">CTR: <span className="text-blue-600 font-bold">{item.ctr}</span></span>
                     </div>
-                    <span className="font-mono font-bold text-blue-600">{topic.clicks.toLocaleString()} Clicks</span>
+                    <span className="font-mono font-bold text-slate-900">{item.clicks.toLocaleString()}</span>
                   </div>
-                  <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-                    <div className={`${topic.color} h-full rounded-full ${topic.width} transition-all duration-1000`}></div>
+                  <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
+                    <div 
+                      className={`${item.color} h-full rounded-full transition-all duration-1000`} 
+                      style={{ width: item.width }}
+                    ></div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
-              <h4 className="text-blue-800 font-bold text-sm mb-1 flex items-center gap-1">
-                <TrendingUp size={14} /> {current.insightTitle}
+            <div className="mt-10 p-5 bg-blue-50 rounded-2xl border border-blue-100">
+              <h4 className="text-blue-900 font-bold text-sm mb-1 flex items-center gap-1">
+                <Icon.Trend /> {t.topics.insightTitle}
               </h4>
-              <p className="text-blue-700 text-sm leading-relaxed">
-                {current.insightContent}
+              <p className="text-blue-800 text-sm leading-relaxed">
+                {t.topics.insightBody}
               </p>
             </div>
           </section>
 
-          {/* 流量來源分析 */}
-          <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold flex items-center gap-2">
-                <PieChart size={20} className="text-blue-600" /> {current.trafficTitle}
+          {/* 流量分佈 */}
+          <section className="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Icon.Chart /> {t.traffic.title}
               </h2>
-              <span className="text-xs text-slate-400">{current.trafficShare}</span>
+              <span className="text-xs font-bold text-gray-400 tracking-wider uppercase">{t.traffic.share}</span>
             </div>
-            <div className="grid grid-cols-1 gap-4">
-              {trafficData.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
-                  <div className={`p-3 rounded-full bg-white shadow-sm border border-slate-100 ${item.color}`}>
+            <div className="space-y-5">
+              {trafficData.map((item, i) => (
+                <div key={i} className="flex items-center gap-4 p-3 rounded-2xl border border-transparent hover:border-gray-100 hover:bg-gray-50 transition-all group">
+                  <div className={`p-3 rounded-xl bg-white shadow-sm border border-gray-100 ${item.color} group-hover:scale-110 transition-transform`}>
                     {item.icon}
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-semibold">{item.source}</span>
-                      <span className="font-bold">{item.percentage}%</span>
+                      <span className="font-bold text-slate-700">{item.name}</span>
+                      <span className="font-bold text-slate-900">{item.percent}%</span>
                     </div>
-                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
                       <div 
-                        className={`bg-slate-700 h-full rounded-full transition-all duration-1000`} 
-                        style={{ width: `${item.percentage}%` }}
+                        className={`${item.bg} h-full rounded-full`} 
+                        style={{ width: `${item.percent}%` }}
                       ></div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-6 pt-6 border-t border-slate-100">
-              <div className="flex items-start gap-3">
-                <div className="bg-amber-100 p-2 rounded-lg text-amber-600">
-                  <TrendingUp size={18} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm">{current.seoTitle}</h4>
-                  <p className="text-sm text-slate-500 mt-1">
-                    {current.seoContent}
-                  </p>
-                </div>
+            <div className="mt-8 pt-8 border-t border-gray-100 flex items-start gap-4">
+              <div className="bg-amber-100 p-3 rounded-xl text-amber-600 shadow-sm shrink-0">
+                <Icon.Trend />
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-800 text-sm">{t.traffic.seoTitle}</h4>
+                <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+                  {t.traffic.seoBody}
+                </p>
               </div>
             </div>
           </section>
         </div>
 
-        {/* 下一步行動建議 */}
-        <section className="mt-8 bg-slate-900 text-white p-8 rounded-2xl">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-              <h2 className="text-xl font-bold mb-2">{current.actionTitle}</h2>
-              <ul className="space-y-2 opacity-80 text-sm">
-                {current.actions.map((action, idx) => (
-                  <li key={idx} className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-blue-400" /> {action}
+        {/* 行動方針 */}
+        <section className="mt-10 bg-slate-900 text-white p-8 md:p-12 rounded-[2.5rem] shadow-xl">
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-10">
+            <div className="w-full lg:w-2/3">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+                {t.actions.title}
+              </h2>
+              <ul className="space-y-4">
+                {t.actions.items.map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-slate-300">
+                    <div className="mt-1.5 h-1.5 w-1.5 bg-blue-400 rounded-full shrink-0"></div>
+                    <span className="font-medium text-lg leading-tight">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-900/20">
-              {current.downloadBtn} <ExternalLink size={18} />
+            <button className="w-full lg:w-auto bg-blue-600 hover:bg-blue-500 text-white px-10 py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-blue-900/40 transition-all active:scale-95">
+              {t.actions.btn}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </button>
           </div>
         </section>
       </main>
 
-      <footer className="max-w-6xl mx-auto px-4 py-12 text-center text-slate-400 text-sm">
-        <p>{current.footer}</p>
+      <footer className="max-w-6xl mx-auto px-4 py-12 text-center text-gray-400 font-medium text-sm border-t border-gray-200 mt-10">
+        {t.footer}
       </footer>
     </div>
   );
